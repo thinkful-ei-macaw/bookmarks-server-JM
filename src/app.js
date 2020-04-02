@@ -53,6 +53,10 @@ function validateBearerToken(req, res, next) {
 
 
 // request handling
+app.get('/', (req, res) => {
+  res.status(200).send('Hello, world!');
+});
+
 app.get('/bookmarks', (req, res) => {
   const db = app.get('db');
   BookmarksService.getAllBookmarks(db)
