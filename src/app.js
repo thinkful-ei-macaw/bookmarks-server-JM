@@ -7,6 +7,7 @@ const winston = require('winston');
 
 const { NODE_ENV } = require('./config');
 const app = express();
+const BookmarksService = require('./bookmarks-service');
 
 const morganOption = (NODE_ENV === 'production') ?
   'tiny' :
@@ -32,10 +33,11 @@ if (NODE_ENV !== 'production') {
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
-app.use(validateBearerToken);
+// app.use(validateBearerToken);
 
 
 // token validation
+// eslint-disable-next-line no-unused-vars
 function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN;
   const authToken = req.get('Authorization');
@@ -49,25 +51,33 @@ function validateBearerToken(req, res, next) {
   next();
 }
 
-const bookmarks = [];
-
 
 // request handling
 app.get('/bookmarks', (req, res) => {
-  res.json(bookmarks);
+  const db = app.get('db');
+  BookmarksService.getAllBookmarks(db)
+    .then(bookmarks => {
+      return res.status(200).json(bookmarks);
+    });
 });
 
-app.get('/bookmark/:id', (req, res) => {
-  const { id } = req.params;
-  const bookmark = bookmarks.find(b => b.id === parseInt(id));
+app.get('/bookmarks/:bookmark_id', (req, res) => {
+  const { bookmark_id } = req.params;
+  const db = app.get('db');
 
-  if (!bookmark) {
-    logger.error(`Bookmark with id ${id} not found.`);
-    return res
-      .status(404)
-      .send('Bookmark Not Found');
-  }
-  res.json(bookmark);
+  BookmarksService.getBookmarkByID(db, bookmark_id)
+    .then(bookmark => {
+      if (!bookmark) {
+        logger.error(`Bookmark with id ${bookmark_id} not found.`);
+        return res
+          .status(404)
+          .send('Bookmark Not Found');
+      }
+
+      return res.status(200).json(bookmark);
+
+    });
+  
 });
 
 
