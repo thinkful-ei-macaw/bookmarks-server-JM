@@ -3,11 +3,9 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
-const {
-  NODE_ENV
-} = require('./config');
 const winston = require('winston');
 
+const { NODE_ENV } = require('./config');
 const app = express();
 
 const morganOption = (NODE_ENV === 'production') ?
@@ -36,6 +34,8 @@ app.use(helmet());
 app.use(cors());
 app.use(validateBearerToken);
 
+
+// token validation
 function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN;
   const authToken = req.get('Authorization');
@@ -49,7 +49,10 @@ function validateBearerToken(req, res, next) {
   next();
 }
 
+const bookmarks = [];
 
+
+// request handling
 app.get('/bookmarks', (req, res) => {
   res.json(bookmarks);
 });
@@ -93,16 +96,4 @@ app.use(errorHandler);
 
 
 // the bottom line, literally
-
-const bookmarks = [{
-  id: 1,
-  title: 'Random Title',
-  rating: 5
-}];
-
-
-
-
-
-
 module.exports = app;
