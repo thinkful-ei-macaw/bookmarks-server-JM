@@ -65,6 +65,20 @@ app.get('/bookmarks', (req, res) => {
     });
 });
 
+
+app.patch('/bookmarks/:bookmark_id', (req, res) => {
+  const db = app.get('db');
+  const { bookmark_id  } = req.params;
+  const { title, description, url, rating } = req.body;
+  const data = {title, description, url, rating };
+
+  console.log('/bookmarks/:bookmark_id')
+  // BookmarksService.updateBookmark(db, bookmark_id, data)
+  //   .then(bookmarks => {
+  //     return res.status(200).json(bookmarks);
+  //   });
+});
+
 app.get('/bookmarks/:bookmark_id', (req, res) => {
   const { bookmark_id } = req.params;
   const db = app.get('db');
@@ -107,6 +121,7 @@ const errorHandler = (error, req, res, next) => {
 };
 
 app.use(errorHandler);
+
 
 
 // the bottom line, literally
